@@ -195,7 +195,3 @@ pip install -r requirements.txt
 - [Flask-CORS documentation](https://flask-cors.readthedocs.io/)
 
 ---
-
-## 📜 License
-
-MIT — see [LICENSE](LICENSE) for details.
