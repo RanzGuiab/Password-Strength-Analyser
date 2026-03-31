@@ -1,30 +1,25 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from zxcvbn import zxcvbn
-import json
 
-def handler(request):
-    """Vercel serverless function handler"""
-    if request.method != "POST":
-        return {"statusCode": 405, "body": json.dumps({"error": "Method not allowed"})}
+app = Flask(__name__)
+CORS(app)
 
-    try:
-        body = json.loads(request.body)
-    except:
-        return {"statusCode": 400, "body": json.dumps({"error": "Invalid JSON"})}
+@app.route("/api/analyse", methods=["POST"])
+def analyse_password():
+    data = request.get_json()
 
-    if not body or "password" not in body:
-        return {"statusCode": 400, "body": json.dumps({"error": "No password provided"})}
+    if not data or "password" not in data:
+        return jsonify({"error": "No password provided"}), 400
 
-    password = body["password"]
+    password = data["password"]
 
     if not isinstance(password, str):
-        return {"statusCode": 400, "body": json.dumps({"error": "Password must be a string"})}
+        return jsonify({"error": "Password must be a string"}), 400
 
-    # Analyse using zxcvbn
     result = zxcvbn(password)
-
     score = result["score"]
 
-    # Map score to human-readable label and color
     score_labels = {
         0: {"label": "Very Weak",  "color": "#e74c3c"},
         1: {"label": "Weak",       "color": "#e67e22"},
@@ -35,7 +30,6 @@ def handler(request):
 
     feedback_warnings = result["feedback"].get("warning", "")
     feedback_suggestions = result["feedback"].get("suggestions", [])
-
     crack_time = result["crack_times_display"]["offline_slow_hashing_1e4_per_second"]
 
     raw_calc_time = result["calc_time"]
@@ -55,8 +49,4 @@ def handler(request):
         "calc_time": round(calc_time_ms, 3),
     }
 
-    return {
-        "statusCode": 200,
-        "headers": {"Content-Type": "application/json"},
-        "body": json.dumps(response)
-    }
+    return jsonify(response), 200
