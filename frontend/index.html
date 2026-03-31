@@ -300,7 +300,7 @@
     </div>
 
     <script>
-      const API_URL = "http://localhost:8888/analyse";
+      const API_URL = "/api/analyse";
 
       const passwordInput  = document.getElementById("passwordInput");
       const analyseBtn     = document.getElementById("analyseBtn");
@@ -364,7 +364,7 @@
 
         } catch (err) {
           if (err.name === "TypeError") {
-            showError("Cannot reach the backend. Make sure Flask is running on port 8888.");
+            showError("Cannot reach the backend. Please try again.");
           } else {
             showError(err.message);
           }
