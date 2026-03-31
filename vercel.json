@@ -1,11 +1,5 @@
 {
   "public": "public",
-  "buildCommand": "echo 'Build complete'",
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "python@3.11"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
