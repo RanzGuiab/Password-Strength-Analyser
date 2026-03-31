@@ -11,7 +11,7 @@ def handler(request):
         }
 
     try:
-        body = json.loads(request.body)
+        data = json.loads(request.body) if isinstance(request.body, str) else request.body
     except:
         return {
             "statusCode": 400,
@@ -19,14 +19,14 @@ def handler(request):
             "body": json.dumps({"error": "Invalid JSON"})
         }
 
-    if not body or "password" not in body:
+    if not data or "password" not in data:
         return {
             "statusCode": 400,
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps({"error": "No password provided"})
         }
 
-    password = body["password"]
+    password = data["password"]
 
     if not isinstance(password, str):
         return {

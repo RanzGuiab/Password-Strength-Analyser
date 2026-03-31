@@ -1,0 +1,4 @@
+frontend/
+venv/
+.git/
+README.md
