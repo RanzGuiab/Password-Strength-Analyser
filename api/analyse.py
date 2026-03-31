@@ -1,21 +1,23 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
 from zxcvbn import zxcvbn
+import json
 
-app = Flask(__name__)
-CORS(app)
+def handler(request):
+    """Vercel serverless function handler"""
+    if request.method != "POST":
+        return {"statusCode": 405, "body": json.dumps({"error": "Method not allowed"})}
 
-@app.route("/api/analyse", methods=["POST"])
-def analyse_password():
-    data = request.get_json()
+    try:
+        body = json.loads(request.body)
+    except:
+        return {"statusCode": 400, "body": json.dumps({"error": "Invalid JSON"})}
 
-    if not data or "password" not in data:
-        return jsonify({"error": "No password provided"}), 400
+    if not body or "password" not in body:
+        return {"statusCode": 400, "body": json.dumps({"error": "No password provided"})}
 
-    password = data["password"]
+    password = body["password"]
 
     if not isinstance(password, str):
-        return jsonify({"error": "Password must be a string"}), 400
+        return {"statusCode": 400, "body": json.dumps({"error": "Password must be a string"})}
 
     # Analyse using zxcvbn
     result = zxcvbn(password)
@@ -53,4 +55,8 @@ def analyse_password():
         "calc_time": round(calc_time_ms, 3),
     }
 
-    return jsonify(response), 200
+    return {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps(response)
+    }
