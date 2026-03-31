@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <title>Password Strength Analyser</title>
+    <style>
+      /* ── Reset & Base ── */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0f172a;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #eee;
+      }
+
+      /* ── Card ── */
+      .card {
+        background: #1a2332;
+        border: 1px solid #2a3f5f;
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        color: #e2e8f0;
+      }
+
+      .subtitle {
+        text-align: center;
+        font-size: 0.85rem;
+        color: #94a3b8;
+      }
+
+      /* ── Input Group ── */
+      .input-group {
+        position: relative;
+        margin-bottom: 1.2rem;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 0.85rem 3rem 0.85rem 1rem;
+        border-radius: 10px;
+        border: 1px solid #334155;
+        background: #0f172a;
+        color: #fff;
+        font-size: 1rem;
+        outline: none;
+        transition: border 0.25s;
+      }
+
+      .input-group input:focus {
+        border-color: #64748b;
+      }
+
+      .input-group input::placeholder { color: #64748b; }
+
+      .toggle-btn {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.1rem;
+        color: #64748b;
+        transition: color 0.2s;
+      }
+
+      .toggle-btn:hover { color: #94a3b8; }
+
+      /* ── Analyse Button ── */
+      .analyse-btn {
+        width: 100%;
+        padding: 0.85rem;
+        border-radius: 10px;
+        border: none;
+        background: #3b82f6;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.1s;
+        letter-spacing: 0.5px;
+      }
+
+      .analyse-btn:hover  { opacity: 0.9; }
+      .analyse-btn:active { transform: scale(0.98); }
+      .analyse-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      /* ── Strength Bar ── */
+      .strength-bar-wrapper {
+        margin-top: 1.5rem;
+        display: none;
+      }
+
+      .strength-bar-wrapper.visible { display: block; }
+
+      .bar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.4rem;
+        font-size: 0.85rem;
+      }
+
+      .bar-label { font-weight: 700; font-size: 0.95rem; }
+
+      .bar-track {
+        width: 100%;
+        height: 10px;
+        background: #1e293b;
+        border-radius: 99px;
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        width: 0%;
+        transition: width 0.6s ease, background-color 0.4s ease;
+      }
+
+      /* ── Result Details ── */
+      .result-section {
+        margin-top: 1.5rem;
+        display: none;
+      }
+
+      .result-section.visible { display: block; }
+
+      .result-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .stat-box {
+        background: #0f172a;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #334155;
+      }
+
+      .stat-box .stat-title {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-box .stat-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #e2e8f0;
+        word-break: break-word;
+      }
+
+      /* ── Feedback ── */
+      .feedback-block {
+        background: #0f172a;
+        border-left: 3px solid #3b82f6;
+        border-radius: 0 8px 8px 0;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.6rem;
+        font-size: 0.88rem;
+        color: #cbd5e1;
+        display: none;
+        border: 1px solid #334155;
+      }
+
+      .feedback-block.visible { display: block; }
+
+      .feedback-block .fb-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: #94a3b8;
+        margin-bottom: 0.3rem;
+      }
+
+      .suggestions-list {
+        padding-left: 1.1rem;
+        margin-top: 0.3rem;
+      }
+
+      .suggestions-list li { margin-bottom: 0.2rem; line-height: 1.5; }
+
+      /* ── Error ── */
+      .error-msg {
+        margin-top: 0.8rem;
+        color: #ef4444;
+        font-size: 0.85rem;
+        text-align: center;
+        display: none;
+      }
+
+      .error-msg.visible { display: block; }
+
+      /* ── Loader ── */
+      .loader {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid #fff;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
+
+      @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Password Analyser</h1>
+
+      <!-- Input -->
+      <div class="input-group">
+        <input
+          type="password"
+          id="passwordInput"
+          placeholder="Enter a password to analyse…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="toggle-btn" id="toggleBtn" title="Show/hide password">👁️</button>
+      </div>
+
+      <!-- Button -->
+      <button class="analyse-btn" id="analyseBtn">Analyse Password</button>
+
+      <!-- Error -->
+      <div class="error-msg" id="errorMsg"></div>
+
+      <!-- Strength Bar -->
+      <div class="strength-bar-wrapper" id="strengthBarWrapper">
+        <div class="bar-header">
+          <span class="bar-label" id="barLabel">—</span>
+          <span id="barScore" style="color:#94a3b8; font-size:0.8rem;"></span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="barFill"></div>
+        </div>
+      </div>
+
+      <!-- Result Details -->
+      <div class="result-section" id="resultSection">
+        <div class="result-grid">
+          <div class="stat-box">
+            <div class="stat-title">Score</div>
+            <div class="stat-value" id="statScore">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-title">Crack Time</div>
+            <div class="stat-value" id="statCrack">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-title">Guesses Required</div>
+            <div class="stat-value" id="statGuesses">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-title">Calc Time</div>
+            <div class="stat-value" id="statCalc">—</div>
+          </div>
+        </div>
+
+        <!-- Warning -->
+        <div class="feedback-block" id="warningBlock">
+          <div class="fb-title">⚠️ Warning</div>
+          <span id="warningText"></span>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="feedback-block" id="suggestionsBlock">
+          <div class="fb-title">💡 Suggestions</div>
+          <ul class="suggestions-list" id="suggestionsList"></ul>
+        </div>
+      </div>
+        <p class="subtitle" style="padding-top: 1rem;">Powered by zxcvbn · Real-time strength feedback</p>
+    </div>
+
+    <script>
+      const API_URL = "/api/analyse";
+
+      const passwordInput  = document.getElementById("passwordInput");
+      const analyseBtn     = document.getElementById("analyseBtn");
+      const toggleBtn      = document.getElementById("toggleBtn");
+      const errorMsg       = document.getElementById("errorMsg");
+      const strengthBarWrapper = document.getElementById("strengthBarWrapper");
+      const barLabel       = document.getElementById("barLabel");
+      const barScore       = document.getElementById("barScore");
+      const barFill        = document.getElementById("barFill");
+      const resultSection  = document.getElementById("resultSection");
+      const statScore      = document.getElementById("statScore");
+      const statCrack      = document.getElementById("statCrack");
+      const statGuesses    = document.getElementById("statGuesses");
+      const statCalc       = document.getElementById("statCalc");
+      const warningBlock   = document.getElementById("warningBlock");
+      const warningText    = document.getElementById("warningText");
+      const suggestionsBlock = document.getElementById("suggestionsBlock");
+      const suggestionsList  = document.getElementById("suggestionsList");
+
+      // ── Toggle password visibility ──
+      toggleBtn.addEventListener("click", () => {
+        const isHidden = passwordInput.type === "password";
+        passwordInput.type = isHidden ? "text" : "password";
+        toggleBtn.innerHTML = isHidden ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+      });
+
+      // ── Analyse on Enter key ──
+      passwordInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") analyseBtn.click();
+      });
+
+      // ── Main analyse logic ──
+      analyseBtn.addEventListener("click", async () => {
+        const password = passwordInput.value;
+
+        // Clear previous state
+        hideError();
+        hideResults();
+
+        if (!password) {
+          showError("Please enter a password first.");
+          return;
+        }
+
+        setLoading(true);
+
+        try {
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password }),
+          });
+
+          if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || `Server error: ${response.status}`);
+          }
+
+          const data = await response.json();
+          renderResults(data);
+
+        } catch (err) {
+          if (err.name === "TypeError") {
+            showError("Cannot reach the backend. Please try again.");
+          } else {
+            showError(err.message);
+          }
+        } finally {
+          setLoading(false);
+        }
+      });
+
+      // ── Render results ──
+      function renderResults(data) {
+        // Strength Bar
+        const scorePercent = ((data.score + 1) / 5) * 100; // 1–5 → 20%–100%
+        barFill.style.width = `${scorePercent}%`;
+        barFill.style.backgroundColor = data.color;
+        barLabel.textContent = data.label;
+        barLabel.style.color = data.color;
+        barScore.textContent = `${data.score} / 4`;
+        strengthBarWrapper.classList.add("visible");
+
+        // Stats
+        statScore.textContent   = `${data.score} / 4`;
+        statCrack.textContent   = data.crack_time;
+        statGuesses.textContent = data.guesses.toLocaleString();
+        statCalc.textContent    = `${data.calc_time.toFixed(3)} ms`;
+        resultSection.classList.add("visible");
+
+        // Warning
+        if (data.warning) {
+          warningText.textContent = data.warning;
+          warningBlock.classList.add("visible");
+        }
+
+        // Suggestions
+        if (data.suggestions && data.suggestions.length > 0) {
+          suggestionsList.innerHTML = "";
+          data.suggestions.forEach((s) => {
+            const li = document.createElement("li");
+            li.textContent = s;
+            suggestionsList.appendChild(li);
+          });
+          suggestionsBlock.classList.add("visible");
+        }
+      }
+
+      // ── Helpers ──
+      function showError(msg) {
+        errorMsg.textContent = msg;
+        errorMsg.classList.add("visible");
+      }
+
+      function hideError() {
+        errorMsg.textContent = "";
+        errorMsg.classList.remove("visible");
+      }
+
+      function hideResults() {
+        strengthBarWrapper.classList.remove("visible");
+        resultSection.classList.remove("visible");
+        warningBlock.classList.remove("visible");
+        suggestionsBlock.classList.remove("visible");
+        barFill.style.width = "0%";
+      }
+
+      function setLoading(loading) {
+        analyseBtn.disabled = loading;
+        analyseBtn.innerHTML = loading
+          ? `<span class="loader"></span>Analysing…`
+          : "Analyse Password";
+      }
+    </script>
+  </body>
+</html>
