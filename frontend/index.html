@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <title>Password Strength Analyser</title>
     <style>
@@ -15,224 +17,441 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #0f172a;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #eee;
+        padding: 1rem;
+        font-family: 'Inter', sans-serif;
+        color: #f1f5f9;
+        overflow-x: hidden;
+        background: linear-gradient(135deg, #0f172a 0%, #1a1f35 25%, #16213e 50%, #0f172a 75%, #1a1f35 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
       }
 
-      /* ── Card ── */
+      @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      /* ── Card with Glassmorphism ── */
       .card {
-        background: #1a2332;
-        border: 1px solid #2a3f5f;
-        border-radius: 16px;
-        padding: 2.5rem 2rem;
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
         width: 100%;
-        max-width: 480px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        max-width: 520px;
+        box-shadow: 
+          0 8px 32px rgba(0, 0, 0, 0.3),
+          inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+        animation: cardEnter 0.6s ease-out;
+      }
+
+      @keyframes cardEnter {
+        from {
+          opacity: 0;
+          transform: translateY(20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .card:hover {
+        border-color: rgba(148, 163, 184, 0.4);
+        box-shadow: 
+          0 12px 48px rgba(0, 0, 0, 0.4),
+          inset 0 1px 1px rgba(255, 255, 255, 0.15);
       }
 
       h1 {
         text-align: center;
-        font-size: 1.6rem;
-        margin-bottom: 1rem;
-        color: #e2e8f0;
+        font-family: 'Poppins', sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.5px;
       }
 
       .subtitle {
         text-align: center;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         color: #94a3b8;
+        margin-bottom: 2rem;
+        font-weight: 300;
+        letter-spacing: 0.3px;
       }
 
       /* ── Input Group ── */
       .input-group {
         position: relative;
-        margin-bottom: 1.2rem;
+        margin-bottom: 1.5rem;
       }
 
       .input-group input {
         width: 100%;
-        padding: 0.85rem 3rem 0.85rem 1rem;
-        border-radius: 10px;
-        border: 1px solid #334155;
-        background: #0f172a;
-        color: #fff;
+        padding: 1rem 2.8rem 1rem 1.2rem;
+        border-radius: 14px;
+        border: 1.5px solid rgba(71, 85, 105, 0.4);
+        background: rgba(15, 23, 42, 0.5);
+        color: #f1f5f9;
         font-size: 1rem;
+        font-weight: 400;
         outline: none;
-        transition: border 0.25s;
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .input-group input::placeholder {
+        color: #64748b;
+        font-weight: 300;
       }
 
       .input-group input:focus {
-        border-color: #64748b;
+        border-color: rgba(59, 130, 246, 0.6);
+        background: rgba(15, 23, 42, 0.7);
+        box-shadow: 
+          inset 0 2px 4px rgba(0, 0, 0, 0.1),
+          0 0 0 3px rgba(59, 130, 246, 0.1);
+        transform: translateY(-1px);
       }
 
-      .input-group input::placeholder { color: #64748b; }
+      .input-group input:not(:placeholder-shown) {
+        background: rgba(15, 23, 42, 0.8);
+      }
 
       .toggle-btn {
         position: absolute;
-        right: 0.75rem;
+        right: 1rem;
         top: 50%;
         transform: translateY(-50%);
-        background: none;
+        background: rgba(59, 130, 246, 0.1);
         border: none;
         cursor: pointer;
         font-size: 1.1rem;
         color: #64748b;
-        transition: color 0.2s;
+        padding: 0.5rem 0.6rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      .toggle-btn:hover { color: #94a3b8; }
+      .toggle-btn:hover {
+        color: #3b82f6;
+        background: rgba(59, 130, 246, 0.2);
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      .toggle-btn:active {
+        transform: translateY(-50%) scale(0.95);
+      }
 
       /* ── Analyse Button ── */
       .analyse-btn {
         width: 100%;
-        padding: 0.85rem;
-        border-radius: 10px;
+        padding: 1rem;
+        border-radius: 14px;
         border: none;
-        background: #3b82f6;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         color: #fff;
         font-size: 1rem;
         font-weight: 600;
+        font-family: 'Inter', sans-serif;
         cursor: pointer;
-        transition: opacity 0.2s, transform 0.1s;
-        letter-spacing: 0.5px;
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+        letter-spacing: 0.3px;
+        box-shadow: 
+          0 4px 15px rgba(59, 130, 246, 0.3),
+          0 0 0 0 rgba(59, 130, 246, 0);
+        position: relative;
+        overflow: hidden;
       }
 
-      .analyse-btn:hover  { opacity: 0.9; }
-      .analyse-btn:active { transform: scale(0.98); }
-      .analyse-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+      .analyse-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+      }
+
+      .analyse-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 
+          0 6px 20px rgba(59, 130, 246, 0.4),
+          0 0 0 0 rgba(59, 130, 246, 0);
+      }
+
+      .analyse-btn:active {
+        transform: translateY(0);
+      }
+
+      .analyse-btn:active::before {
+        width: 300px;
+        height: 300px;
+      }
+
+      .analyse-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
 
       /* ── Strength Bar ── */
       .strength-bar-wrapper {
-        margin-top: 1.5rem;
+        margin-top: 2.5rem;
         display: none;
+        animation: fadeInUp 0.5s ease-out;
       }
 
-      .strength-bar-wrapper.visible { display: block; }
+      .strength-bar-wrapper.visible {
+        display: block;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
       .bar-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 0.4rem;
-        font-size: 0.85rem;
+        margin-bottom: 0.8rem;
+        font-size: 0.9rem;
       }
 
-      .bar-label { font-weight: 700; font-size: 0.95rem; }
+      .bar-label {
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.2px;
+      }
 
       .bar-track {
         width: 100%;
-        height: 10px;
-        background: #1e293b;
+        height: 8px;
+        background: rgba(71, 85, 105, 0.2);
         border-radius: 99px;
         overflow: hidden;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
       }
 
       .bar-fill {
         height: 100%;
         border-radius: 99px;
         width: 0%;
-        transition: width 0.6s ease, background-color 0.4s ease;
+        transition: width 0.7s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.5s ease;
+        box-shadow: 0 0 12px currentColor;
       }
 
       /* ── Result Details ── */
       .result-section {
-        margin-top: 1.5rem;
+        margin-top: 2rem;
         display: none;
+        animation: fadeInUp 0.6s ease-out;
       }
 
-      .result-section.visible { display: block; }
+      .result-section.visible {
+        display: block;
+      }
 
       .result-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
       }
 
       .stat-box {
-        background: #0f172a;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        border: 1px solid #334155;
+        background: rgba(30, 41, 59, 0.6);
+        border-radius: 14px;
+        padding: 1.25rem 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .stat-box:hover {
+        border-color: rgba(148, 163, 184, 0.3);
+        background: rgba(30, 41, 59, 0.8);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       .stat-box .stat-title {
         font-size: 0.7rem;
         color: #94a3b8;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-bottom: 0.25rem;
+        letter-spacing: 0.9px;
+        margin-bottom: 0.4rem;
+        font-weight: 500;
       }
 
       .stat-box .stat-value {
-        font-size: 0.95rem;
-        font-weight: 600;
+        font-size: 1.1rem;
+        font-weight: 700;
         color: #e2e8f0;
         word-break: break-word;
+        font-family: 'Poppins', sans-serif;
       }
 
       /* ── Feedback ── */
       .feedback-block {
-        background: #0f172a;
+        background: rgba(30, 41, 59, 0.6);
         border-left: 3px solid #3b82f6;
-        border-radius: 0 8px 8px 0;
-        padding: 0.75rem 1rem;
-        margin-bottom: 0.6rem;
-        font-size: 0.88rem;
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
+        margin-bottom: 0.8rem;
+        font-size: 0.9rem;
         color: #cbd5e1;
         display: none;
-        border: 1px solid #334155;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        backdrop-filter: blur(10px);
+        animation: slideIn 0.4s ease-out;
+        transition: all 0.3s ease;
       }
 
-      .feedback-block.visible { display: block; }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .feedback-block.visible {
+        display: block;
+      }
+
+      .feedback-block:hover {
+        border-color: rgba(148, 163, 184, 0.3);
+        background: rgba(30, 41, 59, 0.8);
+      }
 
       .feedback-block .fb-title {
         font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.7px;
-        color: #94a3b8;
-        margin-bottom: 0.3rem;
+        letter-spacing: 0.8px;
+        color: #e2e8f0;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
       }
 
       .suggestions-list {
-        padding-left: 1.1rem;
-        margin-top: 0.3rem;
+        padding-left: 1.2rem;
+        margin-top: 0.4rem;
       }
 
-      .suggestions-list li { margin-bottom: 0.2rem; line-height: 1.5; }
+      .suggestions-list li {
+        margin-bottom: 0.4rem;
+        line-height: 1.6;
+        color: #cbd5e1;
+      }
+
+      .suggestions-list li::marker {
+        color: #3b82f6;
+      }
 
       /* ── Error ── */
       .error-msg {
-        margin-top: 0.8rem;
-        color: #ef4444;
-        font-size: 0.85rem;
+        margin-top: 1rem;
+        padding: 0.85rem 1rem;
+        color: #fca5a5;
+        font-size: 0.9rem;
         text-align: center;
         display: none;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 10px;
+        animation: shake 0.4s ease-in-out;
       }
 
-      .error-msg.visible { display: block; }
+      .error-msg.visible {
+        display: block;
+      }
+
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
 
       /* ── Loader ── */
       .loader {
         display: inline-block;
-        width: 14px;
-        height: 14px;
-        border: 2px solid #fff;
-        border-top-color: transparent;
+        width: 16px;
+        height: 16px;
+        border: 2.5px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
         border-radius: 50%;
-        animation: spin 0.7s linear infinite;
-        margin-right: 6px;
+        animation: spin 0.8s linear infinite;
+        margin-right: 8px;
         vertical-align: middle;
       }
 
-      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 640px) {
+        .card {
+          padding: 2rem 1.5rem;
+          border-radius: 20px;
+        }
+
+        h1 {
+          font-size: 1.75rem;
+        }
+
+        .input-group input {
+          padding: 0.9rem 2.5rem 0.9rem 1rem;
+          font-size: 16px;
+        }
+
+        .result-grid {
+          gap: 0.8rem;
+        }
+
+        .stat-box {
+          padding: 1rem 0.85rem;
+        }
+
+        .analyse-btn {
+          padding: 0.9rem;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="card">
-      <h1>Password Analyser</h1>
+      <h1>🔐 Password Analyser</h1>
+      <p class="subtitle">Real-time strength feedback powered by zxcvbn</p>
 
       <!-- Input -->
       <div class="input-group">
@@ -243,20 +462,22 @@
           autocomplete="off"
           spellcheck="false"
         />
-        <button class="toggle-btn" id="toggleBtn" title="Show/hide password">👁️</button>
+        <button class="toggle-btn" id="toggleBtn" type="button" title="Show/hide password">
+          <i class="fas fa-eye"></i>
+        </button>
       </div>
 
       <!-- Button -->
-      <button class="analyse-btn" id="analyseBtn">Analyse Password</button>
+      <button class="analyse-btn" id="analyseBtn" type="button">Analyse Password</button>
 
       <!-- Error -->
-      <div class="error-msg" id="errorMsg"></div>
+      <div class="error-msg" id="errorMsg" role="alert"></div>
 
       <!-- Strength Bar -->
       <div class="strength-bar-wrapper" id="strengthBarWrapper">
         <div class="bar-header">
           <span class="bar-label" id="barLabel">—</span>
-          <span id="barScore" style="color:#94a3b8; font-size:0.8rem;"></span>
+          <span id="barScore" style="color:#94a3b8; font-size:0.85rem; font-weight: 500;"></span>
         </div>
         <div class="bar-track">
           <div class="bar-fill" id="barFill"></div>
@@ -267,78 +488,95 @@
       <div class="result-section" id="resultSection">
         <div class="result-grid">
           <div class="stat-box">
-            <div class="stat-title">Score</div>
+            <div class="stat-title"><i class="fas fa-chart-bar"></i> Score</div>
             <div class="stat-value" id="statScore">—</div>
           </div>
           <div class="stat-box">
-            <div class="stat-title">Crack Time</div>
+            <div class="stat-title"><i class="fas fa-hourglass-end"></i> Crack Time</div>
             <div class="stat-value" id="statCrack">—</div>
           </div>
           <div class="stat-box">
-            <div class="stat-title">Guesses Required</div>
+            <div class="stat-title"><i class="fas fa-calculator"></i> Guesses</div>
             <div class="stat-value" id="statGuesses">—</div>
           </div>
           <div class="stat-box">
-            <div class="stat-title">Calc Time</div>
+            <div class="stat-title"><i class="fas fa-clock"></i> Calc Time</div>
             <div class="stat-value" id="statCalc">—</div>
           </div>
         </div>
 
         <!-- Warning -->
         <div class="feedback-block" id="warningBlock">
-          <div class="fb-title">⚠️ Warning</div>
+          <div class="fb-title"><i class="fas fa-exclamation-triangle"></i> Warning</div>
           <span id="warningText"></span>
         </div>
 
         <!-- Suggestions -->
         <div class="feedback-block" id="suggestionsBlock">
-          <div class="fb-title">💡 Suggestions</div>
+          <div class="fb-title"><i class="fas fa-lightbulb"></i> Suggestions</div>
           <ul class="suggestions-list" id="suggestionsList"></ul>
         </div>
       </div>
-        <p class="subtitle" style="padding-top: 1rem;">Powered by zxcvbn · Real-time strength feedback</p>
     </div>
 
     <script>
       const API_URL = "/api/analyse";
 
-      const passwordInput  = document.getElementById("passwordInput");
-      const analyseBtn     = document.getElementById("analyseBtn");
-      const toggleBtn      = document.getElementById("toggleBtn");
-      const errorMsg       = document.getElementById("errorMsg");
+      const passwordInput = document.getElementById("passwordInput");
+      const analyseBtn = document.getElementById("analyseBtn");
+      const toggleBtn = document.getElementById("toggleBtn");
+      const errorMsg = document.getElementById("errorMsg");
       const strengthBarWrapper = document.getElementById("strengthBarWrapper");
-      const barLabel       = document.getElementById("barLabel");
-      const barScore       = document.getElementById("barScore");
-      const barFill        = document.getElementById("barFill");
-      const resultSection  = document.getElementById("resultSection");
-      const statScore      = document.getElementById("statScore");
-      const statCrack      = document.getElementById("statCrack");
-      const statGuesses    = document.getElementById("statGuesses");
-      const statCalc       = document.getElementById("statCalc");
-      const warningBlock   = document.getElementById("warningBlock");
-      const warningText    = document.getElementById("warningText");
+      const barLabel = document.getElementById("barLabel");
+      const barScore = document.getElementById("barScore");
+      const barFill = document.getElementById("barFill");
+      const resultSection = document.getElementById("resultSection");
+      const statScore = document.getElementById("statScore");
+      const statCrack = document.getElementById("statCrack");
+      const statGuesses = document.getElementById("statGuesses");
+      const statCalc = document.getElementById("statCalc");
+      const warningBlock = document.getElementById("warningBlock");
+      const warningText = document.getElementById("warningText");
       const suggestionsBlock = document.getElementById("suggestionsBlock");
-      const suggestionsList  = document.getElementById("suggestionsList");
+      const suggestionsList = document.getElementById("suggestionsList");
+
+      // Debounce timer for auto-analysis
+      let autoAnalyseTimer;
 
       // ── Toggle password visibility ──
       toggleBtn.addEventListener("click", () => {
         const isHidden = passwordInput.type === "password";
         passwordInput.type = isHidden ? "text" : "password";
-        toggleBtn.innerHTML = isHidden ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        const icon = toggleBtn.querySelector("i");
+        icon.className = isHidden ? "fas fa-eye-slash" : "fas fa-eye";
+      });
+
+      // ── Auto-analyse on input (with debounce) ──
+      passwordInput.addEventListener("input", () => {
+        clearTimeout(autoAnalyseTimer);
+        if (passwordInput.value.length > 3) {
+          autoAnalyseTimer = setTimeout(() => {
+            analyseBtn.click();
+          }, 300);
+        } else {
+          hideResults();
+          hideError();
+        }
       });
 
       // ── Analyse on Enter key ──
       passwordInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") analyseBtn.click();
+        if (e.key === "Enter") {
+          e.preventDefault();
+          analyseBtn.click();
+        }
       });
 
       // ── Main analyse logic ──
       analyseBtn.addEventListener("click", async () => {
         const password = passwordInput.value;
 
-        // Clear previous state
         hideError();
-        hideResults();
 
         if (!password) {
           showError("Please enter a password first.");
@@ -364,7 +602,7 @@
 
         } catch (err) {
           if (err.name === "TypeError") {
-            showError("Cannot reach the backend. Please try again.");
+            showError("Cannot reach the backend. Check your connection.");
           } else {
             showError(err.message);
           }
@@ -373,10 +611,10 @@
         }
       });
 
-      // ── Render results ──
+      // ── Render results with staggered animations ──
       function renderResults(data) {
         // Strength Bar
-        const scorePercent = ((data.score + 1) / 5) * 100; // 1–5 → 20%–100%
+        const scorePercent = ((data.score + 1) / 5) * 100;
         barFill.style.width = `${scorePercent}%`;
         barFill.style.backgroundColor = data.color;
         barLabel.textContent = data.label;
@@ -384,28 +622,43 @@
         barScore.textContent = `${data.score} / 4`;
         strengthBarWrapper.classList.add("visible");
 
-        // Stats
-        statScore.textContent   = `${data.score} / 4`;
-        statCrack.textContent   = data.crack_time;
-        statGuesses.textContent = data.guesses.toLocaleString();
-        statCalc.textContent    = `${data.calc_time.toFixed(3)} ms`;
-        resultSection.classList.add("visible");
+        // Stagger stat box animations
+        setTimeout(() => {
+          statScore.textContent = `${data.score} / 4`;
+          statCrack.textContent = data.crack_time;
+          statGuesses.textContent = data.guesses.toLocaleString();
+          statCalc.textContent = `${data.calc_time.toFixed(2)} ms`;
+          resultSection.classList.add("visible");
+        }, 100);
 
-        // Warning
+        // Warning (staggered)
         if (data.warning) {
-          warningText.textContent = data.warning;
-          warningBlock.classList.add("visible");
+          setTimeout(() => {
+            warningText.textContent = data.warning;
+            warningBlock.classList.add("visible");
+          }, 200);
         }
 
-        // Suggestions
+        // Suggestions (staggered)
         if (data.suggestions && data.suggestions.length > 0) {
-          suggestionsList.innerHTML = "";
-          data.suggestions.forEach((s) => {
-            const li = document.createElement("li");
-            li.textContent = s;
-            suggestionsList.appendChild(li);
-          });
-          suggestionsBlock.classList.add("visible");
+          setTimeout(() => {
+            suggestionsList.innerHTML = "";
+            data.suggestions.forEach((s, idx) => {
+              const li = document.createElement("li");
+              li.textContent = s;
+              li.style.animation = `fadeInUp ${0.3 + idx * 0.1}s ease-out forwards`;
+              li.style.opacity = "0";
+              suggestionsList.appendChild(li);
+            });
+            suggestionsBlock.classList.add("visible");
+          }, 250);
+        } else {
+          suggestionsBlock.classList.remove("visible");
+        }
+
+        // Hide warning if not present
+        if (!data.warning) {
+          warningBlock.classList.remove("visible");
         }
       }
 
@@ -413,6 +666,9 @@
       function showError(msg) {
         errorMsg.textContent = msg;
         errorMsg.classList.add("visible");
+        setTimeout(() => {
+          errorMsg.classList.remove("visible");
+        }, 5000);
       }
 
       function hideError() {
@@ -431,9 +687,14 @@
       function setLoading(loading) {
         analyseBtn.disabled = loading;
         analyseBtn.innerHTML = loading
-          ? `<span class="loader"></span>Analysing…`
+          ? '<span class="loader"></span>Analysing…'
           : "Analyse Password";
       }
+
+      // Focus input on load
+      window.addEventListener("load", () => {
+        passwordInput.focus();
+      });
     </script>
   </body>
 </html>
