@@ -1,5 +1,7 @@
 # 🔐 Password Strength Analyser
 
+<img width="1706" height="889" alt="Screenshot 2026-03-31 at 2 07 29 PM" src="https://github.com/user-attachments/assets/e3b11053-1241-485e-8ce9-c38124f392dd" />
+
 A full-stack demo app that checks the strength of your password in real time.  
 **Backend:** Python (Vercel Serverless Functions) + [zxcvbn](https://github.com/dropbox/zxcvbn)  
 **Frontend:** Static HTML/CSS/JS (served from `public/`)
