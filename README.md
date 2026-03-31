@@ -40,8 +40,8 @@ Password-Strenght-Analyser/
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/<your-username>/Password-Strenght-Analyser.git
-cd Password-Strenght-Analyser
+git clone https://github.com/RanzGuiab/Password-Strength-Analyser.git
+cd Password-Strength-Analyser
 ```
 
 ### 2. Local Dev (Recommended)
