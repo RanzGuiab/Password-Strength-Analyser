@@ -1,9 +1,0 @@
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "password-strength-analyser"
-version = "1.0.0"
-description = "Password strength analyzer with zxcvbn"
-dependencies = ["zxcvbn"]
