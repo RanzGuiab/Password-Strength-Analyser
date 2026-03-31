@@ -1,8 +1,8 @@
 # 🔐 Password Strength Analyser
 
 A full-stack demo app that checks the strength of your password in real time.  
-**Backend:** Python (Flask) + [zxcvbn](https://github.com/dropbox/zxcvbn)  
-**Frontend:** Vanilla HTML/CSS/JS
+**Backend:** Python (Vercel Serverless Functions) + [zxcvbn](https://github.com/dropbox/zxcvbn)  
+**Frontend:** Static HTML/CSS/JS (served from `public/`)
 
 ---
 
@@ -12,19 +12,23 @@ A full-stack demo app that checks the strength of your password in real time.
 - Visual bar + colour-coded strength feedback
 - Crack time estimates, guess count, and practical suggestions
 - Simple, attractive, self-contained frontend (1 file)
-- Python Flask backend — easy to run anywhere
+- Python serverless API (works on Vercel)
 
 ---
 
 ## 🏗 Project Structure
 
 ```
-password-analyser/
-├── backend/
-│   ├── app.py
-│   └── requirements.txt
-└── frontend/
-    └── index.html
+Password-Strenght-Analyser/
+├── api/
+│   ├── analyse.py        # POST /api/analyse
+│   └── index.py          # GET  /api
+├── public/
+│   └── index.html        # served at /
+├── requirements.txt      # python deps for serverless
+├── vercel.json           # routing + outputDirectory
+├── frontend/             # source copy (kept for reference)
+└── backend/              # legacy Flask version (optional)
 ```
 
 ---
@@ -38,49 +42,35 @@ git clone https://github.com/<your-username>/Password-Strenght-Analyser.git
 cd Password-Strenght-Analyser
 ```
 
-### 2. Backend Setup (Python 3.8+)
+### 2. Local Dev (Recommended)
+
+This project is deployed like a typical Vercel app:
+
+- Static site served from `public/`
+- Python serverless functions under `api/`
+
+Run it locally the same way:
 
 ```bash
-cd backend
+# (one-time) install Vercel CLI
+npm i -g vercel
 
-# Create a virtual environment
-python -m venv venv          # or: python3 -m venv venv
-
-# Activate it
-source venv/bin/activate     # macOS/Linux
-venv\Scripts\activate.bat    # Windows (Command Prompt)
-venv\Scripts\Activate.ps1    # Windows (PowerShell)
-
-# Install dependencies
+# (optional but recommended) create & activate a venv, then install python deps
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 
-# Start the Flask server
-python app.py
-# → Running on http://127.0.0.1:5000
+# start the local dev server
+vercel dev
 ```
 
-Test that the backend is alive:
-
-```bash
-curl http://localhost:5000/health
-# → {"status": "ok"}
-
-curl -X POST http://localhost:5000/analyse \
-  -H "Content-Type: application/json" \
-  -d '{"password": "MyP@ssw0rd!"}'
-```
-
-### 3. Frontend
-
-Open `frontend/index.html` directly in your browser — no server required.
-
-> The page calls `http://localhost:5000/analyse`. Make sure Flask is running before clicking **Analyse Password**.
+Then open the URL that `vercel dev` prints (commonly `http://localhost:3000`).
 
 ---
 
 ## 🧑‍💻 API Reference
 
-### `POST /analyse`
+### `POST /api/analyse`
 
 **Request body**
 ```json
@@ -112,15 +102,15 @@ Open `frontend/index.html` directly in your browser — no server required.
 | `guesses` | `int` | Estimated number of guesses needed |
 | `calc_time` | `float` | Analysis duration in milliseconds |
 
-### `GET /health`
+### `GET /api`
 
-Returns `{"status": "ok"}` — useful for confirming the server is up.
+- `GET /api` → `{"status":"ok","endpoints":["/api/analyse"]}`
 
 ---
 
 ## 🌈 Frontend Features
 
-Everything lives in a single file: `frontend/index.html`
+Everything lives in a single file: `public/index.html`
 
 | Feature | Details |
 |---|---|
@@ -138,38 +128,21 @@ Everything lives in a single file: `frontend/index.html`
 ## 🐍 Troubleshooting
 
 ### 404 Not Found
-- Check the URL spelling: the route is `/analyse` (British spelling), **not** `/analyze`
-- Confirm the frontend is sending a `POST` request, not `GET`
-- Restart Flask after any code changes: `Ctrl+C` → `python app.py`
+- Confirm you’re calling the serverless route: `POST /api/analyse`
+- For local dev, run `vercel dev` so `/api/*` routes exist
 
-### `TypeError: Object of type timedelta is not JSON serializable`
-This occurs on **Python 3.14+** where `zxcvbn` returns `calc_time` as a `datetime.timedelta`.  
-The fix is already applied in `app.py`:
-```python
-try:
-    calc_time_ms = raw_calc_time.total_seconds() * 1000  # timedelta → ms
-except AttributeError:
-    calc_time_ms = float(raw_calc_time)                  # already a number
-```
+### `FUNCTION_INVOCATION_FAILED` on Vercel
+- Check the function is returning valid JSON (the serverless handler in `api/analyse.py` defensively serializes responses)
+- Use `vercel logs <your-deployment-url>` to inspect runtime errors
 
 ### CORS Errors in Browser
-`flask-cors` is enabled by default for all origins. If you still see CORS errors, confirm `flask-cors` installed correctly:
-```bash
-pip install flask-cors
-```
+The serverless endpoint returns permissive CORS headers. If you open the HTML directly from disk (`file://`), prefer using `vercel dev` instead.
 
-### `Address already in use` (Port 5000)
-```bash
-# macOS/Linux
-lsof -ti:5000 | xargs kill -9
-
-# Windows
-netstat -ano | findstr :5000
-taskkill /PID <PID_NUMBER> /F
-```
+### Port already in use
+`vercel dev` commonly uses port `3000`. Stop the process using that port, or run `vercel dev -p 3001`.
 
 ### Module Not Found
-Always activate your virtual environment before running Flask:
+Activate your virtual environment before installing Python dependencies:
 ```bash
 source venv/bin/activate   # macOS/Linux
 venv\Scripts\activate.bat  # Windows
@@ -182,8 +155,6 @@ pip install -r requirements.txt
 
 | Package | Version | Purpose |
 |---|---|---|
-| `flask` | latest | Web framework / REST API |
-| `flask-cors` | latest | Cross-origin request support |
 | `zxcvbn` | latest | Password strength estimation engine |
 
 ---
@@ -191,7 +162,5 @@ pip install -r requirements.txt
 ## 📖 References
 
 - [zxcvbn — Dropbox password strength estimator](https://github.com/dropbox/zxcvbn)
-- [Flask documentation](https://flask.palletsprojects.com/)
-- [Flask-CORS documentation](https://flask-cors.readthedocs.io/)
 
 ---
